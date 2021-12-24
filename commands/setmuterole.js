@@ -1,15 +1,21 @@
-const db = require("quick.db");
+const DB = require('../helpers/db-functions')
 
 exports.run = async (bot, message, args) => {
     if (!message.member.permissions.has("ADMINISTRATOR"))
       return message.channel.send(
         "**You Do Not Have The Required Permissions! - [ADMINISTRATOR]**"
       );
+
+    const db = new DB()
+
     if (!args[0]) {
-      let b = await db.fetch(`muterole_${message.guild.id}`);
-      let roleName = message.guild.roles.cache.get(b);
-      if (message.guild.roles.cache.has(b)) {
-        return message.channel.send(
+      const querry = { channelId: message.guild.id }
+      const muteRole = await db.GetRoleMute( querry, 'role_id' )
+
+      let roleName = message.guild.roles.cache.get(muteRole);
+
+      if (message.guild.roles.cache.has(muteRole)) {
+        return message.channel.send( 
           `**Muterole Set In This Server Is \`${roleName.name}\`!**`
         );
       } else
@@ -29,18 +35,21 @@ exports.run = async (bot, message, args) => {
       return message.channel.send("**Please Enter A Valid Role Name or ID!**");
 
     try {
-      let a = await db.fetch(`muterole_${message.guild.id}`);
+      const querry = { channelId: message.guild.id }
+      const roleFound = await db.GetRoleMute( querry, 'role_id' )
 
-      if (role.id === a) {
+      if (role.id === roleFound ) {
         return message.channel.send(
           "**This Role is Already Set As Muterole!**"
         );
       } else {
-        db.set(`muterole_${message.guild.id}`, role.id);
 
+        db.SetNewMuteRole({ channelId: message.guild.id, role_id: role.id })
+        
         message.channel.send(
           `**\`${role.name}\` Has Been Set Successfully As Muterole!**`
         );
+
       }
     } catch (e) {
       return message.channel.send(

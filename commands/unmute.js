@@ -1,17 +1,17 @@
 const Discord = require('discord.js');
 const { messageEmbed } = require('../helpers/messageEmbeds');
-const db = require('quick.db')
-// const { getData, deleteData } = require('../include/dbutils');
+const DB = require('../helpers/db-functions')
 
 exports.run = async(client, message, args) => {
 
     if( message.member.permissions.has('MANAGE_ROLES')) {
+        const db = new DB()
+
         const member = message.mentions.members.first() || await message.guild.members.fetch(args[0])
         
         let reason = args.slice(1).join(" ");
 
         const prefix = client.config.prefix
-        const roleMuted = client.config.muteRole
 
         if( !args[0] ) {
             const opt = {
@@ -26,19 +26,21 @@ exports.run = async(client, message, args) => {
             const unmuteEmbed = messageEmbed( opt, true )
             return message.channel.send({ embeds: [unmuteEmbed] })
         }
+        let querry = { channelId: message.guild.id }
+        let roleMuted = await db.GetRoleMute( querry, 'role_id' );
             
-        let muteRole = message.guild.roles.cache.find( role => role.name.includes( roleMuted) )
+        let muteRole = message.guild.roles.cache.find( role => role.id === roleMuted )
 
         let role
-        let dbmute = await db.fetch(`muterole_${message.guild.id}`);
-
-        if (!message.guild.roles.cache.has(dbmute)) {
+        if (!message.guild.roles.cache.has(muteRole)) {
             role = muteRole
         } else {
-            role = message.guild.roles.cache.get(dbmute)
+            role = message.guild.roles.cache.get(muteRole)
         }
 
-        let roleFetch = db.fetch(`muteeid_${message.guild.id}_${member.id}`)
+        // let roleFetch = db.fetch(`muteeid_${message.guild.id}_${member.id}`)
+        querry = { channelId: message.guild.id, user_id: member.id }
+        let roleFetch = await db.GetMembersData( querry, 'roles' )
 
         if (!roleFetch) return;
 
@@ -56,14 +58,12 @@ exports.run = async(client, message, args) => {
         }
 
         try {
-            console.log('Before remove role')
-            console.log(member.roles)
+            console.log(role)
             await member.roles.remove([role.id]).then((id) => {
 
                 const opt = {
                 description: `✅ ${member} has been unmuted!
-                                \n**Previous Reason:** ${reason || "No Reason"}
-                                \n${id}`,
+                                \n**Previous Reason:** ${reason || "No Reason"}`,
                     color: 'green'
                 }
                 const msgEmbed = messageEmbed( opt )
@@ -89,24 +89,24 @@ exports.run = async(client, message, args) => {
             member.roles.add(roleAddSecond)
         }
 
-        let channel = db.fetch(`modlog_${message.guild.id}`)
-        if (!channel) return;
+        // let channel = db.fetch(`modlog_${message.guild.id}`)
+        // if (!channel) return;
 
-        let embed = new Discord.MessageEmbed()
-            .setColor("RED")
-            .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-            .setAuthor(`${message.guild.name} Modlogs`, message.guild.iconURL())
-            .addField("**Moderation**", "unmute")
-            .addField("**Unmuted**", member.user.username)
-            .addField("**Moderator**", message.author.username)
-            .addField("**Reason**", `${reason || "**No Reason**"}`)
-            .addField("**Date**", message.createdAt.toLocaleString())
-            .setFooter(message.member.displayName, message.author.displayAvatarURL())
-            .setTimestamp();
+        // let embed = new Discord.MessageEmbed()
+        //     .setColor("RED")
+        //     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+        //     .setAuthor(`${message.guild.name} Modlogs`, message.guild.iconURL())
+        //     .addField("**Moderation**", "unmute")
+        //     .addField("**Unmuted**", member.user.username)
+        //     .addField("**Moderator**", message.author.username)
+        //     .addField("**Reason**", `${reason || "**No Reason**"}`)
+        //     .addField("**Date**", message.createdAt.toLocaleString())
+        //     .setFooter(message.member.displayName, message.author.displayAvatarURL())
+        //     .setTimestamp();
 
-        var sChannel = message.guild.channels.cache.get(channel)
-        if (!sChannel) return;
-        sChannel.send({ embeds: [embed] })
+        // var sChannel = message.guild.channels.cache.get(channel)
+        // if (!sChannel) return;
+        // sChannel.send({ embeds: [embed] })
 
         
     } else {

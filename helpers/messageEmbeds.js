@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 
-const messageEmbed = ( options, addFields = false ) => {
+const messageEmbed = ( options, addFields = false) => {
     const message = new Discord.MessageEmbed()
 
     let values = {
@@ -23,7 +23,7 @@ const messageEmbed = ( options, addFields = false ) => {
     }
 
     if( addFields ) {
-        message.addField(values.fieldValue, values.field)
+        message.addField(values.fieldValue, values.field, true)
     } 
 
     message
@@ -35,6 +35,7 @@ const messageEmbed = ( options, addFields = false ) => {
         .setThumbnail(values.thumbnail)
         .setImage(values.image)
         .setFooter(values.footer)
+        .setTimestamp();
 
     return message
 

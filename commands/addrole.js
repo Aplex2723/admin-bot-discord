@@ -4,10 +4,8 @@ const { messageEmbed } = require('../helpers/messageEmbeds');
 exports.run = async(client, message, args) => {
 
     if( message.member.permissions.has('MANAGE_ROLES')){
-        console.log(args)
         const member = message.mentions.members.first() || await message.guild.members.fetch(args[0])
-    
-        console.log(member)
+
         if( !member ){
             const options = {
                 title: `**✏ Command: ${client.config.prefix}addrole**`,
@@ -18,10 +16,12 @@ exports.run = async(client, message, args) => {
                 color: 'RANDOM'
             }
             const addroleEmbed = messageEmbed( options, true )
-            message.channel.send( {embeds: [addroleEmbed]} )
+            return message.channel.send( {embeds: [addroleEmbed]} )
         }else {
             const role = message.guild.roles.cache.find(role => role.name == args.slice(1).join(' ') )
+
             if( !args.slice(1).join(' ') ){
+
                 const options = {
                     description: '❌ No role was provided.',
                     color: 'RED'

@@ -1,32 +1,34 @@
 const Discord = require('discord.js');
 const { messageEmbed } = require('../helpers/messageEmbeds');
-
-const db = require('quick.db')
-// const { insertData, getData } = require('../include/dbutils');
+const DB = require('../helpers/db-functions')
 
 exports.run = async(client, message, args) => {
-    const roleMuted = client.config.muteRole
     const prefix = client.config.prefix
-
+    
     if( message.member.permissions.has('MANAGE_ROLES')) {
+        const db = new DB()
+        
         const member = message.mentions.members.first() || await message.guild.members.fetch(args[0])
 
         let reason = args.slice(1).join(" ")
-
+        
         if( !args[0] ) {
-           const options = {
-               title: `**🔇 Command: ${prefix}mute**`,
-               fieldValue: 'The user is not able to send messages or add reactions',
-               field: `**🛠 Usage: **${prefix}mute _[username/user-id]_ _[reason]_
-                    \n**🔐 Required permissions:** ***MANAGE ROLES***
-                    \n**📝 Examples:** \n${prefix}mute ${message.member} _Example reason_\n${prefix}mute \`${message.member.id}\` _Example reason_
-                    `,
+            const options = {
+                title: `**🔇 Command: ${prefix}mute**`,
+                fieldValue: 'The user is not able to send messages or add reactions',
+                field: `**🛠 Usage: **${prefix}mute _[username/user-id]_ _[reason]_
+                \n**🔐 Required permissions:** ***MANAGE ROLES***
+                \n**📝 Examples:** \n${prefix}mute ${message.member} _Example reason_\n${prefix}mute \`${message.member.id}\` _Example reason_
+                `,
                 color: 'random'
-           } 
-           const muteEmbed = messageEmbed( options, true)
-           return message.channel.send({ embeds: [muteEmbed] })
+            } 
+            const muteEmbed = messageEmbed( options, true)
+            return message.channel.send({ embeds: [muteEmbed] })
         } else { 
-            let muteRole = message.guild.roles.cache.find( role => role.name === roleMuted )
+
+            const querry = { channelId: message.guild.id }
+            const roleMuted = await db.GetRoleMute( querry, 'role_id' )
+            let muteRole = message.guild.roles.cache.find( role => role.id === roleMuted )
 
             if (message.author.bot) return message.channel.send("**🦾 Cannot Mute Bots!**");
 
@@ -35,13 +37,13 @@ exports.run = async(client, message, args) => {
                 .map(r => r.id)
 
             let role
-            let dbmute = await db.fetch(`muterole_${message.guild.id}`);
-            console.log(dbmute)
+            // let dbmute = await db.fetch(`muterole_${message.guild.id}`);
+            // const dbmute = await db.GetRoleMute( querry, 'role_id' )
 
-            if (!message.guild.roles.cache.has(dbmute)) {
+            if (!message.guild.roles.cache.has(muteRole)) {
                 role = muteRole
             } else {
-                role = message.guild.roles.cache.get(dbmute)
+                role = message.guild.roles.cache.get(muteRole)
             }
             
             if( member.roles.cache.has(role.id) ) {
@@ -71,11 +73,15 @@ exports.run = async(client, message, args) => {
                 }).then( muteRole => {
                     member.roles.add(muteRole)
                     const options = {
-                        description: `✅ ${member} has been muted.`,
+                        description: `✅ ${member} has been muted nad the role has been created \n***SET THE NEW ROLE WITH*** ${prefix}setmuterole <role_id>`,
                         color: 'green'
                     }
                     const msgEmbed = messageEmbed(options)
                     message.channel.send({ embeds: [msgEmbed] })
+
+                    db.SetNewMuteRole( { querry, role_id: muteRole.id })
+                    console.log(`Role ${muteRole.id} created in DB`)
+
                 }).catch( error => {
                     console.log(error)
                     const options = {
@@ -88,7 +94,13 @@ exports.run = async(client, message, args) => {
                 
             } else {
 
-                db.set(`muteeid_${message.guild.id}_${member.id}`, userRoles)
+                // db.set(`muteeid_${message.guild.id}_${member.id}`, userRoles)
+                const config = {
+                    channelId: message.guild.id,
+                    user_id: member.id,
+                    roles: userRoles
+                }
+                await db.SaveData( config )
 
                 try {
                     await member.roles.set( [role.id] ).then( async() => {
@@ -114,24 +126,24 @@ exports.run = async(client, message, args) => {
                    member.roles.set([role.id])
                 }
 
-                let channel = db.fetch(`modlog_${message.guild.id}`)
-                if (!channel) return;
+                // let channel = db.fetch(`modlog_${message.guild.id}`)
+                // if (!channel) return;
 
-                let embed = new Discord.MessageEmbed()
-                    .setColor('RED')
-                    .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-                    .setAuthor(`${message.guild.name} Modlogs`, message.guild.iconURL())
-                    .addField("**Moderation**", "mute")
-                    .addField("**Member**", member.user.username)
-                    .addField("**Moderator**", message.author.username)
-                    .addField("**Reason**", `${reason || "**No Reason**"}`)
-                    .addField("**Date**", message.createdAt.toLocaleString())
-                    .setFooter(message.member.displayName, message.author.displayAvatarURL())
-                    .setTimestamp()
+                // let embed = new Discord.MessageEmbed()
+                //     .setColor('RED')
+                //     .setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+                //     .setAuthor(`${message.guild.name} Modlogs`, message.guild.iconURL())
+                //     .addField("**Moderation**", "mute")
+                //     .addField("**Member**", member.user.username)
+                //     .addField("**Moderator**", message.author.username)
+                //     .addField("**Reason**", `${reason || "**No Reason**"}`)
+                //     .addField("**Date**", message.createdAt.toLocaleString())
+                //     .setFooter(message.member.displayName, message.author.displayAvatarURL())
+                //     .setTimestamp()
 
-                let sChannel = message.guild.channels.cache.get(channel)
-                if (!sChannel) return;
-                sChannel.send({embeds: [embed]})
+                // let sChannel = message.guild.channels.cache.get(channel)
+                // if (!sChannel) return;
+                // sChannel.send({embeds: [embed]})
             
             }
 

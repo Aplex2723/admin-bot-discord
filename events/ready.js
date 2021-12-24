@@ -1,8 +1,22 @@
 const fetch = require('node-fetch');
 const dbutils = require('../include/dbutils');
+const mongoose = require('mongoose');
 const { MessageEmbed } = require('discord.js');
 
 module.exports = async (client) => {
+
+    try {
+
+        await mongoose.connect( client.config.mongoURI, { keepAlive: true })
+        console.log('Connection to database established')
+        
+    } catch (error) {
+
+        console.log(error)
+        throw new Error(`Connection to database failed`)
+        
+    }
+
     async function presence() {
         let infos = await client.function.fetchinfo(client.config.admin_id);
         if (infos) {
