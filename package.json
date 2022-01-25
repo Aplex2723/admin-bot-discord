@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "discord.js": "^13.3.1",
+    "discord.js-pagination": "^1.0.3",
     "giphy-js-sdk-core": "^1.0.6",
     "moment": "^2.29.1",
     "mongoose": "^6.1.2",
-    "node-json-db": "^1.4.1",
     "nodemon": "^2.0.15",
     "string-table": "^0.1.5"
   }

@@ -36,12 +36,6 @@ module.exports = {
             client.color = '#' + client.config.color.replace(/#/gi, '');
         } else
             client.color = '#007acc';
-
-        if (client.config.thumbnail_image_url) {
-            client.thumbnail = client.config.thumbnail_image_url;
-        } else
-            client.thumbnail = 'https://i.gyazo.com/898c573e108fe755661265fc27ee7335.png';
-
         if (client.config.footer) {
             client.footer = client.config.footer;
         } else
@@ -54,40 +48,6 @@ module.exports = {
         var minutes = Math.floor((uptime % 3600) / 60);
         var seconds = Math.round(uptime % 60);
         return (days > 0 ? days + " days, " : "") + (hours > 0 ? hours + " hours, " : "") + (minutes > 0 ? minutes + " minutes, " : "") + (seconds > 0 ? seconds + " seconds" : "");
-    },
-
-    async fetchinfo(id) {
-        let response = await fetch('http://api.raidmax.org:5000/instance/' + id)
-            .then((res) => res.json())
-            .catch(() => { console.log('\x1b[31mWarning: Masterserver not reachable\x1b[0m') });
-        if (response && response.servers) {
-            let hostnames = [];
-            let players = [];
-            let maxplayers = [];
-            let gamemap = [];
-            let gametype = [];
-            let serid = [];
-            let serip = [];
-            let gameparser = [];
-            let gamename = [];
-            var total = response.servers.length;
-            for (i = 0; i < total; i++) {
-                if (response.servers[i]) {
-                    hostnames[i] = (i + 1) + '. ' + response.servers[i].hostname.replace(/\^[0-9:;c]/g, '');
-                    players[i] = response.servers[i].clientnum;
-                    maxplayers[i] = response.servers[i].maxclientnum;
-                    gamemap[i] = response.servers[i].map;
-                    gametype[i] = response.servers[i].gametype;
-                    serid[i] = response.servers[i].id;
-                    serip[i] = response.servers[i].ip + ':' + response.servers[i].port;
-                    gameparser[i] = response.servers[i].version;
-                    gamename[i] = response.servers[i].game
-                }
-            }
-            return [hostnames, players, maxplayers, gamemap, gametype, serid, serip, gameparser, gamename];
-        } else {
-            return false;
-        }
     },
 
     async execute(url, id, cookie, cmd) {

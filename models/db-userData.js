@@ -1,10 +1,11 @@
 const { model, Schema } = require('mongoose')
+const moment = require('moment')
 
 const modelSchema = Schema({
 
-    channelId: {
+    server_id: {
         type: String,
-        required: [true, 'The channelID is required']
+        required: [true, 'The server ID is required']
     },
 
     user_id: {
@@ -16,6 +17,22 @@ const modelSchema = Schema({
         type: String
     }],
 
+    reason: {
+        type: String,
+        default: "No reason"
+    },
+
+    command: {
+        type: String,
+        required: [true, 'The command type is required']
+    },
+
+    date: {
+        type: String,
+        default: moment().format('MMMM Do YYYY, h:mm:ss a')
+    },
+
+
 })
 
-module.exports = model('Data', modelSchema, 'Data')
+module.exports = model('SanctionsData', modelSchema, 'SanctionsData')

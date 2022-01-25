@@ -1,7 +1,7 @@
 const { model, Schema } = require('mongoose')
 
 const modelSchema = Schema({ 
-    channelId: {
+    server_id: {
         type: String,
         required: true,
     },
