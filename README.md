@@ -1,4 +1,4 @@
-# Administration and Moderation Discord Bot
+# 🦾 Administration and Moderation Discord Bot
 
 A simple Discord bot capable of providing different administrative tools to facilitate the moderation work of Discord servers, this project is free, feel free to edit it to improve its functions and be able to give a better personalized experience for your server.
 
@@ -23,6 +23,6 @@ A simple Discord bot capable of providing different administrative tools to faci
 
 ## ❓ Contact:
 If you have any questions about the operation of the bot, let me know through the following means of communication in which I hope you will have an immediate response from me.
-| Discord | Mail | Steam |
+| 📱 Discord | 📪 Mail | 💻 Steam | 🛠 GitHub |
 | --- | --- | --- |
-| `TheAplex27#7565` | `aplex.2723@gmail.com` | `Aplex27` |
+| `TheAplex27#7565` | `aplex.2723@gmail.com` | `Aplex27` | `Aplex2723` |
