@@ -21,7 +21,7 @@ A simple Discord bot capable of providing different administrative tools to faci
 
 ⚠ More command will be added in the future
 
-#❓ Contact:
+## ❓ Contact:
 If you have any questions about the operation of the bot, let me know through the following means of communication in which I hope you will have an immediate response from me.
 | Discord | Mail | Steam |
 | --- | --- | --- |
