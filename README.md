@@ -24,5 +24,5 @@ A simple Discord bot capable of providing different administrative tools to faci
 ## ❓ Contact:
 If you have any questions about the operation of the bot, let me know through the following means of communication in which I hope you will have an immediate response from me.
 | 📱 Discord | 📪 Mail | 💻 Steam | 🛠 GitHub |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | `TheAplex27#7565` | `aplex.2723@gmail.com` | `Aplex27` | `Aplex2723` |
